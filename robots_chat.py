@@ -125,8 +125,10 @@ def text_reply(msg):
                         u"Time:%s    \n"
                         u" Message:%s" % (friend['NickName'], friend['RemarkName'], time.ctime(), receive_cont),
                         toUserName='filehelper')
-            itchat.send('%s' %send_msg(reply_content),toUserName=msg['FromUserName'])
-
+            if msg["Type"]=='Text':
+                itchat.send('%s' %send_msg(reply_content),toUserName=msg['FromUserName'])
+            else:
+                itchat.send(u"我已经收到你在【%s】发送的消息,稍后回复。--微信助手" % (time.ctime(),), toUserName=msg['FromUserName'])
         else:
             itchat.send(u"Friend:%s -- %s  \n"
                         u"Time:%s    \n"
