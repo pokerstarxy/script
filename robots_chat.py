@@ -120,16 +120,21 @@ def text_reply(msg):
         else:
             reply_content = {u'text': u'你发的是什么科技啊！', u'code': u'error'}
         if not user_status:
+            if msg["Type"] != 'Text':
+                receive_cont=reply_content
+                itchat.send(u"我已经收到你在【%s】发送的消息,稍后回复。--微信助手" % (time.ctime(),), toUserName=msg['FromUserName'])
+            else:
+                itchat.send('%s' % send_msg(reply_content), toUserName=msg['FromUserName'])
             # itchat.send(u'我不在线哦~,有事情先说！以下是机器人的回复',toUserName=msg['FromUserName'])
             itchat.send(u"Friend:%s -- %s  \n"
                         u"Time:%s    \n"
                         u" Message:%s" % (friend['NickName'], friend['RemarkName'], time.ctime(), receive_cont),
                         toUserName='filehelper')
-            if msg["Type"]=='Text':
-                itchat.send('%s' %send_msg(reply_content),toUserName=msg['FromUserName'])
-            else:
-                itchat.send(u"我已经收到你在【%s】发送的消息,稍后回复。--微信助手" % (time.ctime(),), toUserName=msg['FromUserName'])
         else:
+            if msg["Type"] != 'Text':
+                receive_cont=reply_content
+            else:
+                pass
             itchat.send(u"Friend:%s -- %s  \n"
                         u"Time:%s    \n"
                         u" Message:%s \n"
