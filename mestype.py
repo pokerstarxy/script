@@ -3,7 +3,8 @@
 # Author Pokerstarxy 2017-06-02 13:12:44
 # Email pokerstarxy@sina.com
 
-
+# itchat.send(u"我已经收到你在【%s】发送的消息,稍后回复。--微信助手" % (time.ctime(),),toUserName=msg['FromUserName'])
+        #                     toUserName=msg['FromUserName'])
 
 # elif msg['Type'] == 'Picture':
 #     reply_content = u"图片: " + msg['FileName']
