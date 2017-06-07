@@ -2,7 +2,7 @@
 #coding=utf8
 
 #pip install itchat  运行这个
-import  itchat,re,time,requests,smtplib,json,os,sys
+import itchat,re,time,requests,smtplib,json,os,sys
 from itchat.content import *
 from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
@@ -16,7 +16,9 @@ code_type={'100000':u"文本类",
            '308000':u'菜谱类'
            }
 error_code=['40001','40002','40004','40007']
-#图灵api
+dirname=['file','image','media','voice']
+
+
 def tuling_api(info):
     api_key = 'd2ce0ef74fa64f13964270d90dec6652'
     api_url = 'http://www.tuling123.com/openapi/api'
@@ -27,7 +29,7 @@ def tuling_api(info):
     }
     return requests.post(api_url,data=data)
 
-#邮件
+
 def mailme():
     subject_cont = u"温馨提示--关于微信错误提示"
     cont = u"robots wrong！"
@@ -40,24 +42,11 @@ def mailme():
     server.sendmail("pokerstar_xy@sina.com", "pokerstarxy@qq.com", msg.as_string())
     server.quit()
 
-#计时
-def gettime():
-    timexx=time.strftime("%Y%m%d%H%M%S", time.localtime())
-    strtime=time.strptime(timexx, '%Y%m%d%H%M%S')
-    time1 = time.mktime(strtime)
-    return time1
 
-#用户名
 def getusername(name):
     return name
 
-#传输二维码
-def trans_photos():
-    path=os.path.join(os.path.dirname("__file__"),'itchat.pkl')
-    with open (path,'rb+') as f:
-        cont=f.read()
 
-#本地存储
 def msg_store(msg):
     with open('msg.bak','a+') as f:
         f.writelines(msg)
@@ -67,9 +56,19 @@ def msg_store(msg):
 def send_msg(reply_content):
     reply_content = json.loads(reply_content)
     results = ''
-    del reply_content[u'code']
-    results = '\n'.join(reply_content.values())
-    return results
+    if reply_content[u'code'] in error_code:
+        return u'something wrong'
+    else:
+        del reply_content[u'code']
+        if not reply_content.has_key(u'list'):
+            results = '\n'.join(reply_content.values())
+        else:
+            res=reply_content
+            del res[u'list']
+            results = '\n'.join(res.values())
+            for index,cont in enumerate(reply_content[u'list']):
+                results=results+str(index)+u':\n'+'\n'.join(cont.values())
+        return results
 
 
 @itchat.msg_register([TEXT, PICTURE, MAP, CARD, NOTE, SHARING,RECORDING, ATTACHMENT, VIDEO])
@@ -82,6 +81,12 @@ def text_reply(msg):
             user_status=True
         elif msg['Text']=='down':
             user_status=False
+        elif msg['Text']=='clearall':
+            for listdir in dirname:
+                pathname='./%s' %listdir
+                os.system('rm -rf  '+pathname)
+                os.system('mkdir '+ listdir)
+            itchat.send(u'clear', toUserName='filehelper')
         else:
             pass
     else:
@@ -98,9 +103,7 @@ def text_reply(msg):
             reply_content = u"图片已经远程存储在电脑上"
             msg['Text']('image/'+msg['FileName'])
         elif msg['Type'] == 'Card':
-            reply_content = msg['RecommendInfo']['NickName'] + u" 的名片 \n"
-            print msg['Text']
-            #获取微信联系人信息
+            reply_content = msg['RecommendInfo']['NickName'] + u"已被添加 \n"
         elif msg['Type'] == 'Map':
             x, y, location = re.search("<location x=\"(.*?)\" y=\"(.*?)\".*label=\"(.*?)\".*", msg['OriContent']).group(
                 1,
@@ -128,10 +131,8 @@ def text_reply(msg):
         if not user_status:
             if msg["Type"] != 'Text':
                 receive_cont=reply_content
-                # itchat.send(u"我已经收到你在【%s】发送的消息,稍后回复。--微信助手" % (time.ctime(),), toUserName=msg['FromUserName'])
             else:
                 itchat.send('%s  ^--robots--^' % send_msg(reply_content), toUserName=msg['FromUserName'])
-            # itchat.send(u'我不在线哦~,有事情先说！以下是机器人的回复',toUserName=msg['FromUserName'])
             itchat.send(u"Friend:%s -- %s  \n"
                         u"Time:%s    \n"
                         u" Message:%s" % (friend['NickName'], friend['RemarkName'], time.ctime(), receive_cont),
@@ -149,12 +150,22 @@ def text_reply(msg):
 
 
 def main():
+    basedir = os.path.dirname('__file__')
+    for i in dirname:
+        listdir = os.path.join(basedir, i)
+        if os.path.exists(listdir):
+            pass
+        else:
+            os.system('mkdir ' + listdir)
     itchat.auto_login(hotReload=True)
     itchat.run()
 
 if __name__ == "__main__":
     user_name = getusername("test")
     main()
+
+#部署
+
 
 
 
