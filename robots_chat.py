@@ -71,7 +71,7 @@ def send_msg(reply_content):
     results = '\n'.join(reply_content.values())
     return results
 
-# def handle_chat():
+
 @itchat.msg_register([TEXT, PICTURE, MAP, CARD, NOTE, SHARING,RECORDING, ATTACHMENT, VIDEO])
 def text_reply(msg):
     global user_status
@@ -95,9 +95,12 @@ def text_reply(msg):
                 reply_content = {u'text': u'机器人出了故障哦', u'code': u'error'}
                 mailme()
         elif msg['Type'] == 'Picture':
-            reply_content = u"图片: " + msg['FileName']
+            reply_content = u"图片已经远程存储在电脑上"
+            msg['Text']('image/'+msg['FileName'])
         elif msg['Type'] == 'Card':
-            reply_content = u" " + msg['RecommendInfo']['NickName'] + u" 的名片"
+            reply_content = msg['RecommendInfo']['NickName'] + u" 的名片 \n"
+            print msg['Text']
+            #获取微信联系人信息
         elif msg['Type'] == 'Map':
             x, y, location = re.search("<location x=\"(.*?)\" y=\"(.*?)\".*label=\"(.*?)\".*", msg['OriContent']).group(
                 1,
@@ -108,23 +111,26 @@ def text_reply(msg):
             else:
                 reply_content = u"位置: " + location
         elif msg['Type'] == 'Note':
-            reply_content = u"通知"
+            reply_content = u"笔记"
         elif msg['Type'] == 'Sharing':
-            reply_content = u"分享"
+            reply_content = "%s \n%s" %(msg['FileName'],msg['Url'])
         elif msg['Type'] == 'Recording':
-            reply_content = u"语音"
+            reply_content = u"语音已经远程存储在电脑上"
+            msg['Text']('voice/'+msg['FileName'])
         elif msg['Type'] == 'Attachment':
-            reply_content = u"文件: " + msg['FileName']
+            reply_content = u"文件已经远程存储在电脑上"
+            msg['Text']('file/'+msg['FileName'])
         elif msg['Type'] == 'Video':
-            reply_content = u"视频: " + msg['FileName']
+            reply_content = u"视频已经远程存储在电脑上"
+            msg['Text']('media/'+msg['FileName'])
         else:
             reply_content = {u'text': u'你发的是什么科技啊！', u'code': u'error'}
         if not user_status:
             if msg["Type"] != 'Text':
                 receive_cont=reply_content
-                itchat.send(u"我已经收到你在【%s】发送的消息,稍后回复。--微信助手" % (time.ctime(),), toUserName=msg['FromUserName'])
+                # itchat.send(u"我已经收到你在【%s】发送的消息,稍后回复。--微信助手" % (time.ctime(),), toUserName=msg['FromUserName'])
             else:
-                itchat.send('%s' % send_msg(reply_content), toUserName=msg['FromUserName'])
+                itchat.send('%s  ^--robots--^' % send_msg(reply_content), toUserName=msg['FromUserName'])
             # itchat.send(u'我不在线哦~,有事情先说！以下是机器人的回复',toUserName=msg['FromUserName'])
             itchat.send(u"Friend:%s -- %s  \n"
                         u"Time:%s    \n"
@@ -141,12 +147,13 @@ def text_reply(msg):
                         u"recommend:%s" % (friend['NickName'], friend['RemarkName'], time.ctime(), receive_cont,send_msg(reply_content)),
                         toUserName='filehelper')
 
+
 def main():
     itchat.auto_login(hotReload=True)
     itchat.run()
 
 if __name__ == "__main__":
-    user_name = getusername("qwert")
+    user_name = getusername("test")
     main()
 
 
