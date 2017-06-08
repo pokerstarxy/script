@@ -2,7 +2,7 @@
 #coding=utf8
 
 #pip install itchat  运行这个
-import itchat,re,time,requests,smtplib,json,os,sys
+import itchat,re,time,requests,smtplib,json,os,sys,shutil
 from itchat.content import *
 from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
@@ -60,14 +60,16 @@ def send_msg(reply_content):
         return u'something wrong'
     else:
         del reply_content[u'code']
-        if not reply_content.has_key(u'list'):
-            results = '\n'.join(reply_content.values())
-        else:
-            res=reply_content
-            del res[u'list']
-            results = '\n'.join(res.values())
-            for index,cont in enumerate(reply_content[u'list']):
-                results=results+str(index)+u':\n'+'\n'.join(cont.values())
+        results = '\n'.join(reply_content.values())
+        """目前没看到list形式的返回，无法测试"""
+        # if not reply_content.has_key(u'list'):
+        #     results = '\n'.join(reply_content.values())
+        # else:
+        #     res=reply_content
+        #     del res[u'list']
+        #     results = '\n'.join(res.values())
+        #     for index,cont in enumerate(reply_content[u'list']):
+        #         results=results+str(index)+u':\n'+'\n'.join(cont.values())
         return results
 
 
@@ -75,6 +77,7 @@ def send_msg(reply_content):
 def text_reply(msg):
     global user_status
     global user_name
+    global basedir
     friend = itchat.search_friends(userName=msg['FromUserName'])
     if friend['NickName'] == user_name:
         if msg['Text']=='up':
@@ -83,9 +86,9 @@ def text_reply(msg):
             user_status=False
         elif msg['Text']=='clearall':
             for listdir in dirname:
-                pathname='./%s' %listdir
-                os.system('rm -rf  '+pathname)
-                os.system('mkdir '+ listdir)
+                pathname=os.path.join(basedir, listdir)
+                shutil.rmtree(pathname)
+                os.mkdir(pathname)
             itchat.send(u'clear', toUserName='filehelper')
         else:
             pass
@@ -150,17 +153,18 @@ def text_reply(msg):
 
 
 def main():
-    basedir = os.path.dirname('__file__')
+    global basedir
     for i in dirname:
-        listdir = os.path.join(basedir, i)
+        listdir=os.path.join(basedir,i)
         if os.path.exists(listdir):
             pass
         else:
-            os.system('mkdir ' + listdir)
+            os.mkdir(listdir)
     itchat.auto_login(hotReload=True)
     itchat.run()
 
 if __name__ == "__main__":
+    basedir = os.path.dirname(__file__)
     user_name = getusername("test")
     main()
 
