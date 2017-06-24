@@ -38,8 +38,8 @@ def mailme():
     msg['To'] = formataddr([u"me", "pokerstartxy@qq.com"])
     msg['Subject'] = subject_cont
     server = smtplib.SMTP("smtp.sina.com")
-    server.login('pokerstar_xy@sina.com', 'xy906307')
-    server.sendmail("pokerstar_xy@sina.com", "pokerstarxy@qq.com", msg.as_string())
+    server.login('test_code@sina.com', 'pwd@test')
+    server.sendmail("test_code@sina.com", "pokerstarxy@qq.com", msg.as_string())
     server.quit()
 
 
