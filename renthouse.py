@@ -18,16 +18,20 @@ urldetail='http://zu.sz.fang.com'
 
 
 def mysql_down(msg):
+    db = MySQLdb.connect("127.0.0.1", "root", "171024", "test")
+    db.set_character_set('utf8')
+    cursor = db.cursor()
+    SQL = 'insert into mydjango.house (url,typehouse,map,area,price,img_url,info,status,uptime) values("%s","%s","%s","%s",%d,"%s","%s",%d,"%s");' % (
+    msg['houseurl'],msg['housetype'], msg['housemap'], msg['housearea'], int(msg['houseprice']), msg['houseimg'], msg['describe'],
+    int(msg['status']), msg['updatetime'].replace('/', '-'))
     try:
-        SQL = 'insert into test.house (url,typehouse,map,area,price,img_url,info,status,uptime) values("%s","%s","%s","%s",%d,"%s","%s",%d,"%s");' % (
-        msg['houseurl'],msg['housetype'], msg['housemap'], msg['housearea'], int(msg['houseprice']), msg['houseimg'], msg['describe'],
-        int(msg['status']), msg['updatetime'].replace('/', '-'))
         cursor.execute(SQL)
-        db.commit()
-    except:
-        msg=json.dumps(msg,ensure_ascii=False)
+    except Exception as e:
+        msg = json.dumps(msg, ensure_ascii=False)
         write_down(msg)
-
+        print e
+    db.commit()
+    db.close()
 
 
 def write_down(msg):
@@ -149,6 +153,7 @@ def deal_html(url,cont,area):
                 mysql_down(detail_info)
                 ran_time=random.randint(1,4)
                 time.sleep(ran_time)
+
             print '%s ok' %page_now
             if int(page_now)==int(max_page):
                 return 'end'
@@ -178,14 +183,8 @@ if __name__=="__main__":
     max_page=1
     page_now=1
     # urllist_xx={}
-    db = MySQLdb.connect("127.0.0.1", "root", "171024", "test")
-    db.set_character_set('utf8')
-    cursor = db.cursor()
-    cursor.execute('SET NAMES utf8;')
-    cursor.execute('SET CHARACTER SET utf8;')
-    cursor.execute('SET character_set_connection=utf8;')
     main()
-    db.close()
+
 
 
 
