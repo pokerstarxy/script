@@ -4,7 +4,7 @@ import requests,re,sys,random,time,json
 from bs4 import BeautifulSoup
 reload(sys)
 sys.setdefaultencoding('utf8')
-url='https://sz.zu.anjuke.com/fangyuan/{0}/fx1-je1500-js500/'
+urlbase='https://sz.zu.anjuke.com/fangyuan/{0}/fx1-je1500-js500/'
 # area_list=['longgang','futian','luohu','yantian','longhua']
 area_list=['futian','yantian']
 headers = { "Accept":"text/html,application/xhtml+xml,application/xml;",
@@ -87,5 +87,5 @@ def get_page_url(url,place):
 
 
 for place in area_list:
-    url=url.format(place)
+    url=urlbase.format(place)
     get_page_url(url,place)
