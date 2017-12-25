@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-#coding=utf8
-
+#-*- coding:utf8 -*-
+# Author Pokerstarxy 2017-07-04 09:23:51
+# Email pokerstarxy@sina.com
 #pip install itchat  运行这个
 import itchat,re,time,requests,smtplib,json,os,sys,shutil
 from itchat.content import *
@@ -62,14 +63,6 @@ def send_msg(reply_content):
         del reply_content[u'code']
         results = '\n'.join(reply_content.values())
         """目前没看到list形式的返回，无法测试"""
-        # if not reply_content.has_key(u'list'):
-        #     results = '\n'.join(reply_content.values())
-        # else:
-        #     res=reply_content
-        #     del res[u'list']
-        #     results = '\n'.join(res.values())
-        #     for index,cont in enumerate(reply_content[u'list']):
-        #         results=results+str(index)+u':\n'+'\n'.join(cont.values())
         return results
 
 
@@ -152,6 +145,24 @@ def text_reply(msg):
                         toUserName='filehelper')
 
 
+@itchat.msg_register('Friends')
+def add_friend(msg):
+    itchat.add_friend(**msg['Text'])
+    itchat.get_contract()
+    itchat.send_msg(msg['RecommendInfo']['UserName'], 'Nice to meet you!')
+
+
+def logon_t00ls(cont_msg):
+    offical_account=itchat.get_mps()
+    for eachone in offical_account:
+        if eachone['PYQuanPin']== 'T00ls':
+            gzh_id=eachone['UserName']
+            for  i in cont_msg:
+                itchat.send(i,gzh_id)
+        else:
+            pass
+
+
 def main():
     global basedir
     for i in dirname:
@@ -161,14 +172,15 @@ def main():
         else:
             os.mkdir(listdir)
     itchat.auto_login(hotReload=True)
+    # logon_t00ls(['3','4'])
     itchat.run()
 
 if __name__ == "__main__":
     basedir = os.path.dirname(__file__)
-    user_name = getusername("test")
+    user_name = getusername("qwert")
     main()
 
-#部署
+
 
 
 

@@ -24,7 +24,6 @@ def info_mail(name,cont):
     server.sendmail("xx@sina.com", name, msg.as_string())
     server.quit()
 
-
 # def ran_num_bak():
 #     ran_str=[]
 #     for i in xrange(8):
@@ -54,16 +53,12 @@ def ran_num(mode):
     return "".join(ran_str)
 
 
-
-
-
 def user_info():
     """
     produce  random info 
     :return username,userpwd: 
     """
     return (ran_num('u'),ran_num('p'))
-
 
 
 def exec_command(ip,hostname,hostpwd):
@@ -97,7 +92,6 @@ def exec_command(ip,hostname,hostpwd):
         info_mail("xx@qq.com",msg)
     finally:
         ssh.close()
-
 
 
 if __name__ == "__main__":
