@@ -21,8 +21,8 @@ def mysql_down(msg):
     db = MySQLdb.connect("127.0.0.1", "root", "171024", "test")
     db.set_character_set('utf8')
     cursor = db.cursor()
-    SQL = 'insert into mydjango.house (url,typehouse,map,area,price,img_url,info,status,uptime) values("%s","%s","%s","%s",%d,"%s","%s",%d,"%s");' % (
-    msg['houseurl'],msg['housetype'], msg['housemap'], msg['housearea'], int(msg['houseprice']), msg['houseimg'], msg['describe'],
+    SQL = 'insert into mydjango.house (url,typehouse,map,area,price,img_url,info,status,uptime) values("%s","%s","%s","%s","%s","%s","%s",%d,"%s");' % (
+    msg['houseurl'],msg['housetype'], msg['housemap'], msg['housearea'], msg['houseprice'], msg['houseimg'], MySQLdb.escape_string(msg['describe']),
     int(msg['status']), msg['updatetime'].replace('/', '-'))
     try:
         cursor.execute(SQL)
@@ -101,7 +101,7 @@ def get_house_info(url):
     except:
         info_map='/None'
     try:
-        info_map = 'http://zu.sz.fang.com' + info_map[0]['src']
+        info_map = urldetail + info_map[0]['src']
     except:
         info_map=u'无'
     try:
@@ -120,7 +120,7 @@ def get_house_info(url):
                 u'status':status,
                 u'houseurl':url
                  }
-    driver.close()
+    driver.quit()
     return each_info
 
 
@@ -151,7 +151,7 @@ def deal_html(url,cont,area):
             for i in house_info:
                 detail_info=get_house_info(urldetail+i.find_all('a')[0]['href'])
                 mysql_down(detail_info)
-                ran_time=random.randint(1,4)
+                ran_time=random.randint(1,2)
                 time.sleep(ran_time)
 
             print '%s ok' %page_now
@@ -172,19 +172,17 @@ def get_info(url,position):
 
 
 def main():
-    p = Pool(4)
+    # p = Pool(4)
     for i,j in area_list.items():
         url=urlbase.format(j)
-        p.apply_async(get_info,(url,i))
-    p.close()
-    p.join()
+        # p.apply_async(get_info,(url,i))
+        get_info(url,i)
+    # p.close()
+    # p.join()
 
 if __name__=="__main__":
     max_page=1
     page_now=1
-    # urllist_xx={}
     main()
-
-
 
 
