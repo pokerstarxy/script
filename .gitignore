@@ -13,3 +13,4 @@ house.txt
 mysqlback.py
 .idea/
 *.pyc
+/aa
